@@ -1,14 +1,31 @@
-
-#include "mainwindow.h"
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #include <QApplication>
-#include <QSplashScreen>
-#include <QTimer>
+#include <QCommandLineParser>
+
+#include "imageviewer.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    return a.exec();
+    QApplication app(argc, argv);
+    QGuiApplication::setApplicationDisplayName(ImageViewer::tr("ImgHPF: Dynamic Image Viewer and High Pass Filter"));
+    //QGuiApplication->setGeometry(0, 0, 300, 100);
+    QPalette pal = QPalette(); // set backgnd color
+    pal.setColor(QPalette::Window, "#6264a7");
+
+
+    QCommandLineParser commandLineParser;
+    commandLineParser.addHelpOption();
+    commandLineParser.addPositionalArgument(ImageViewer::tr("[file]"), ImageViewer::tr("Image file to open."));
+    commandLineParser.process(QCoreApplication::arguments());
+    ImageViewer imageViewer;
+    if (!commandLineParser.positionalArguments().isEmpty()
+        && !imageViewer.loadFile(commandLineParser.positionalArguments().constFirst())) {
+        return -1;
+    }
+    imageViewer.setAutoFillBackground(true);
+    imageViewer.setPalette(pal);
+    imageViewer.show();
+    return app.exec();
 }
